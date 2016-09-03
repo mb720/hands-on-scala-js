@@ -14,7 +14,7 @@
   @li
     JavaScript on the client vs. PHP/Perl/Python/Ruby/Java on the server
   @li
-    Most back ends make heavy use of C extensions, and front end code was tightly coupled to the DOM. Even if you manage to port the main language
+    Most backends make heavy use of C extensions, and frontend code was tightly coupled to the DOM. Even if you manage to port the main language
 @p
   There have been some attempts in recent years with more traction: Node.js, for example, has been very successful at running JavaScript on the server, the Clojure/ClojureScript community has their own version of cross-built code, and there are a number of smaller, more esoteric platforms.
 
@@ -46,7 +46,7 @@
   @hl.ref(wd/'examples/'crossBuilds/'clientserver/"build.sbt")
 
   @p
-    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} subprojects. Both projects share a number of settings: the settings to add @lnk.github.Scalatags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
+    Again, we are using @hl.scala{crossProject} to define our @code{js/} and @code{jvm/} subprojects. Both projects share a number of settings: the settings to add @lnk.github.ScalaTags and @lnk.github.uPickle to the build. Note that those two dependencies use the triple @code{%%%} instead of the double @code{%%} to declare: this means that for each dependency, we will pull in the Scala JVM or Scala.js version depending on whether it's being used in a Scala.js project. Note also the @hl.scala{packageArchetype.java_application} setting, which isn't strictly necessary depending on what you want to do with the application, but this example needs it as part of the deployment to Heroku.
 
   @p
     The @code{js/} subproject is uneventful, with a dependency on the by-now-familiar @code{scalajs-dom} library. The @code{jvm/} project, on the other hand, is interesting: it contains the dependencies required for us to set up out Spray server, and one additional thing: we add the output of @code{fastOptJS} from the client to the @code{resources} on the server. This will allow the @code{server} to serve the compiled JavaScript from our @code{client} project from its resources.
@@ -66,7 +66,7 @@
   @hl.ref(server/"Page.scala")
 
   @p
-    This is a typical @lnk.github.Scalatags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the file system! We can declare all HTML, including the skeleton of the page, in Scalatags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
+    This is a typical @lnk.github.ScalaTags HTML snippet. Note that since we're serving it directly from the server in Scala code, we do not need to leave a @code{.html} file somewhere on the file system! We can declare all HTML, including the skeleton of the page, in ScalaTags. Otherwise it's the same as what we saw in earlier chapters: A simple HTML page which includes a script tag to run our Scala.js application.
   @p
     Lastly, we'll set up the Scala.js main method, which we are calling in the @hl.xml{<script>} tag above to kick off the client-side application.
 
@@ -98,9 +98,9 @@
   @sect{Shared Templating}
 
     @p
-      In both the client code and the server code, we made use of the same Scalatags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the Scalatags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
+      In both the client code and the server code, we made use of the same ScalaTags HTML generation library. This is pretty neat: transferring rendering logic between client and server no longer means an annoying/messy rewrite! You can simply C&P the ScalaTags snippet over. That means it's easy if you want to e.g. shift the logic from one side to the other in order to optimize for performance or time-to-load or other things.
     @p
-      One thing to take note of is that we're actually using subtly @i{different} implementations of Scalatags on both sides: on the server, we're importing from @hl.scala{scalatags.Text}, while on the client we're using @hl.scala{scalatags.JsDom}. The @hl.scala{Text} back end renders directly to Strings, and is available on both Scala JVM and Scala.js. The @hl.scala{JsDom} back end, on the other hand, renders to @lnk.dom.html.Elements which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @lnk.dom.html.Element objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
+      One thing to take note of is that we're actually using subtly @i{different} implementations of ScalaTags on both sides: on the server, we're importing from @hl.scala{ScalaTags.Text}, while on the client we're using @hl.scala{ScalaTags.JsDom}. The @hl.scala{Text} back end renders directly to Strings, and is available on both Scala JVM and Scala.js. The @hl.scala{JsDom} back end, on the other hand, renders to @lnk.dom.html.Elements which only exist on Scala.js. Thus while on the client you can do things like attach event listeners to the rendered @lnk.dom.html.Element objects, or checking their runtime @code{.value}, on the server you can't. And that's exactly what you want!
 
   @sect{Shared Code}
     @p
@@ -246,7 +246,7 @@
       @li
         It is impossible for the route and the endpoint method-name to diverge accidentally: if the endpoint is called @hl.scala{list}, the requests will go through the @code{/list} URL. No room for discussion, or to make a mistake
       @li
-        You cannot accidentally rename the route on the server without changing the client, or vice versa. Attempts to do so will cause a compilation error, and even your IDE should highlight it as red. Try it out!
+        You cannot accidentally rename the route on the server without changing the client, or vice versa. Attempts to do so will cause a compilation error and even your IDE should highlight it as red. Try it out!
 
       @li
         There is no chance of messing up the serialization/deserialization code, e.g. writing a response of type A on the server and trying to read a data-structure of type B on the client. You have no opportunity to make an error: you pass arguments to the Ajax call, and they are serialized/deserialized automatically, such that by the time you get access to the value on the server, it is already of the correct type! The same applies to serializing/deserializing the return value on the client. There is simply no place for you as a developer to accidentally make a mistake!
